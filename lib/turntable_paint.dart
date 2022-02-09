@@ -1,12 +1,14 @@
 import 'dart:math';
-
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 class TurntablePainter extends CustomPainter {
   ///标题组
   final List<String> titles;
+  final ui.Image? icon;
+  final ui.Image? point;
 
-  TurntablePainter(this.titles);
+  TurntablePainter(this.titles, this.icon, this.point);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -48,6 +50,77 @@ class TurntablePainter extends CustomPainter {
 
       canvas.restore(); //恢复
     }
+
+    paint.color = Colors.white;
+    canvas.drawCircle(
+        Offset(size.width / 2, size.height / 2), size.width / 10, paint);
+    //绘制图标
+    // ui.Image icon = ui.Image()
+
+    if (icon != null) {
+      // canvas.drawImage(icon!, Offset(size.width / 2, size.height / 2), paint);
+      // canvas.drawImageRect(
+      //     icon!,
+      //     Rect.fromLTRB(0, 0, icon!.width * 1.0, icon!.height * 1.0),
+      //     Rect.fromCenter(
+      //         center: Offset(size.width / 2, size.height / 2),
+      //         width: size.width / 8,
+      //         height: size.width / 8),
+      //     paint);
+    }
+
+    ///绘制外圆
+    canvas.drawCircle(
+        Offset(size.width / 2, size.height / 2),
+        size.width / 2,
+        paint
+          ..style = PaintingStyle.stroke
+          ..color = Colors.orange
+          ..strokeWidth = 10);
+
+    ///绘制指针
+    // if (point != null) {
+    //   // canvas.drawImage(icon!, Offset(size.width / 2, size.height / 2), paint);
+    //   canvas.save();
+    //   // canvas.translate(-size.width / 2, -size.height / 2);
+    //   canvas.rotate(2 * pi * 0.4);
+
+    //   canvas.drawImageRect(
+    //       point!,
+    //       Rect.fromLTRB(0, 0, point!.width * 1.0, point!.height * 1.0),
+    //       const Rect.fromLTRB(0, 0, 50, 50)
+    //           .translate(-size.width / 3, -size.height),
+    //       paint);
+
+    //   canvas.restore();
+    // }
+
+    _drawPoint(canvas, size);
+  }
+
+  //绘制指针
+  _drawPoint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.translate(size.width / 2, size.height / 2);
+    Path path = Path();
+
+    path.moveTo(0, -50);
+    path.lineTo(-20, 10);
+    path.lineTo(0, 0);
+    path.lineTo(20, 10);
+    // path.arcToPoint(const Offset(0, 30),
+    //     radius: const Radius.circular(20), largeArc: true);
+    // path.close();
+
+    Paint paint = Paint()
+      ..strokeCap = StrokeCap.round
+      ..color = Colors.pink
+      ..strokeWidth = 3
+      ..isAntiAlias = true
+      ..style = PaintingStyle.fill; //填充、
+    canvas.drawPath(path, paint);
+
+    canvas.restore();
   }
 
   @override
