@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 class TurntablePainter extends CustomPainter {
   ///标题组
   final List<String> titles;
-  final ui.Image? icon;
-  final ui.Image? point;
+  final Animation<double> repaint;
+  final double? target;
 
-  TurntablePainter(this.titles, this.icon, this.point);
+  TurntablePainter(this.titles, this.repaint, {this.target})
+      : super(repaint: repaint);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -54,20 +55,6 @@ class TurntablePainter extends CustomPainter {
     paint.color = Colors.white;
     canvas.drawCircle(
         Offset(size.width / 2, size.height / 2), size.width / 10, paint);
-    //绘制图标
-    // ui.Image icon = ui.Image()
-
-    if (icon != null) {
-      // canvas.drawImage(icon!, Offset(size.width / 2, size.height / 2), paint);
-      // canvas.drawImageRect(
-      //     icon!,
-      //     Rect.fromLTRB(0, 0, icon!.width * 1.0, icon!.height * 1.0),
-      //     Rect.fromCenter(
-      //         center: Offset(size.width / 2, size.height / 2),
-      //         width: size.width / 8,
-      //         height: size.width / 8),
-      //     paint);
-    }
 
     ///绘制外圆
     canvas.drawCircle(
@@ -102,6 +89,11 @@ class TurntablePainter extends CustomPainter {
   _drawPoint(Canvas canvas, Size size) {
     canvas.save();
     canvas.translate(size.width / 2, size.height / 2);
+    double num = 5;
+    if (target != null) {
+      num += target!;
+    }
+    canvas.rotate(repaint.value * 2 * pi * num + pi * 0.5);
     Path path = Path();
 
     path.moveTo(0, -50);
@@ -124,7 +116,9 @@ class TurntablePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  bool shouldRepaint(TurntablePainter oldDelegate) {
+    return oldDelegate.repaint.value != repaint.value;
+  }
 
   @override
   bool shouldRebuildSemantics(CustomPainter oldDelegate) => false;
