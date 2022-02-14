@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:luck_turntable/common/instances.dart';
 
 class TurntablePainter extends CustomPainter {
   ///标题组
@@ -27,14 +28,16 @@ class TurntablePainter extends CustomPainter {
     List<Color> turntableColors = [Colors.red, Colors.green, Colors.blue];
 
     for (var i = 0; i < num; i++) {
-      paint.color = turntableColors[(i + 1) % 3];
+      paint.color = (i + 1) % 2 == 0
+          ? currentColorScheme.primary
+          : currentColorScheme.primary.withOpacity(0.8);
       //绘制分区
       canvas.drawArc(rect, 2 * pi * i / num, 2 * pi * 1 / num, true, paint);
       //绘制文字
       TextPainter textPainter = TextPainter(
           text: TextSpan(
               text: titles[i],
-              style: const TextStyle(fontSize: 15, color: Colors.white)),
+              style: const TextStyle(fontSize: 18, color: Colors.white)),
           textAlign: TextAlign.left,
           textDirection: TextDirection.ltr);
 
@@ -42,7 +45,7 @@ class TurntablePainter extends CustomPainter {
       Size textSize = textPainter.size;
       canvas.save(); //保存画布副本
       Offset offset = Offset(
-          size.width / 2 / 2 - textSize.width / 2 + 10, -textSize.height / 2);
+          size.width / 2 - textSize.width - 10 - 10, -textSize.height / 2);
       canvas.translate(size.width / 2, size.height / 2); //画布移动到中心
       double roaAngle = 2 * pi * (i / num + 1 / num / 2);
       canvas.rotate(roaAngle); //画布旋转到水平角度,方便布局
@@ -52,10 +55,6 @@ class TurntablePainter extends CustomPainter {
       canvas.restore(); //恢复
     }
 
-    paint.color = Colors.white;
-    canvas.drawCircle(
-        Offset(size.width / 2, size.height / 2), size.width / 10, paint);
-
     ///绘制外圆
     canvas.drawCircle(
         Offset(size.width / 2, size.height / 2),
@@ -64,23 +63,6 @@ class TurntablePainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..color = Colors.orange
           ..strokeWidth = 10);
-
-    ///绘制指针
-    // if (point != null) {
-    //   // canvas.drawImage(icon!, Offset(size.width / 2, size.height / 2), paint);
-    //   canvas.save();
-    //   // canvas.translate(-size.width / 2, -size.height / 2);
-    //   canvas.rotate(2 * pi * 0.4);
-
-    //   canvas.drawImageRect(
-    //       point!,
-    //       Rect.fromLTRB(0, 0, point!.width * 1.0, point!.height * 1.0),
-    //       const Rect.fromLTRB(0, 0, 50, 50)
-    //           .translate(-size.width / 3, -size.height),
-    //       paint);
-
-    //   canvas.restore();
-    // }
 
     _drawPoint(canvas, size);
   }
@@ -113,6 +95,40 @@ class TurntablePainter extends CustomPainter {
     canvas.drawPath(path, paint);
 
     canvas.restore();
+    //绘制外圆
+    canvas.drawCircle(
+        Offset(size.width / 2, size.height / 2),
+        size.width / 12,
+        paint
+          ..color = Colors.white
+          ..style = PaintingStyle.fill);
+    //绘制内圆
+    canvas.drawCircle(
+        Offset(size.width / 2, size.height / 2),
+        size.width / 15,
+        paint
+          ..color = Colors.pink
+          ..style = PaintingStyle.fill);
+    //绘制文字
+
+    TextPainter textPainter = TextPainter(
+        text: const TextSpan(
+            text: "转",
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            )),
+        textAlign: TextAlign.left,
+        textDirection: TextDirection.ltr);
+
+    textPainter.layout();
+    Size textSize = textPainter.size;
+    Offset offset = Offset(size.width / 2 - textSize.width / 2,
+        size.height / 2 - textSize.height / 2);
+    // canvas.translate(size.width / 2, size.height / 2); //画布移动到中心
+    //绘制文字
+    textPainter.paint(canvas, offset);
   }
 
   @override

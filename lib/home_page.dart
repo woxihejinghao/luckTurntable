@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
     _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1));
+        AnimationController(vsync: this, duration: const Duration(seconds: 2));
     // _controller.fling(
     //     velocity: 10,
     //     springDescription:
