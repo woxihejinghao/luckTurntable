@@ -5,7 +5,7 @@ part 'options_model.g.dart';
 const optionsBox = 'options';
 
 @HiveType(typeId: 1)
-class OptionsModel {
+class OptionsModel extends HiveObject {
   @HiveField(0)
   String? name;
 

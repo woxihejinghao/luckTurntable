@@ -208,7 +208,12 @@ class _OptionEditPageState extends State<OptionEditPage> {
             return;
           }
           var box = Hive.box("options");
-          box.add(model);
+          if (model.key != null && widget.model != null) {
+            box.put(model.key, model);
+          } else {
+            box.add(model);
+          }
+
           Navigator.pop(context);
         },
         child: const Text(

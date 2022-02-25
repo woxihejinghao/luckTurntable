@@ -12,7 +12,12 @@ class InputBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController editingController = TextEditingController(text: text);
+    final TextEditingController editingController = TextEditingController();
+    editingController.value = TextEditingValue(
+        //光标移到最后
+        text: text ?? "",
+        selection: TextSelection.fromPosition(TextPosition(
+            affinity: TextAffinity.downstream, offset: (text ?? "").length)));
     return AnimatedPadding(
       padding: MediaQuery.of(context).viewInsets,
       duration: const Duration(milliseconds: 50),

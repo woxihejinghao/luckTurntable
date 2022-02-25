@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:luck_turntable/common/instances.dart';
+import 'package:luck_turntable/models/options_model.dart';
 import 'package:luck_turntable/turntable_paint.dart';
 
 class ChoicePage extends StatefulWidget {
@@ -15,7 +16,8 @@ class _ChoicePageState extends State<ChoicePage>
   late AnimationController _controller;
   late Animation<double> _angleAnimation;
   String result = "";
-  final List<String> titles = ["螺蛳粉", "麻辣烫"];
+
+  var model = OptionsModel();
 
   double target = 0;
   @override
@@ -41,14 +43,22 @@ class _ChoicePageState extends State<ChoicePage>
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildResultContainer(),
-            SizedBox(
-              height: MediaQuery.of(context).size.width * 0.9 + 50,
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: CustomPaint(
-                painter:
-                    TurntablePainter(titles, _angleAnimation, target: target),
-              ),
-            ),
+            model.items.isEmpty
+                ? Text(
+                    "请选择模版...",
+                    style: currentTheme.textTheme.subtitle1
+                        ?.copyWith(color: Colors.grey),
+                  )
+                : SizedBox(
+                    height: MediaQuery.of(context).size.width * 0.9 + 50,
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    child: CustomPaint(
+                      painter: TurntablePainter(
+                          model.items.map((e) => e.name ?? "").toList(),
+                          _angleAnimation,
+                          target: target),
+                    ),
+                  ),
             const SizedBox(
               height: 60,
             ),
@@ -75,9 +85,9 @@ class _ChoicePageState extends State<ChoicePage>
               _controller.reset();
               _controller.forward().then((value) {
                 setState(() {
-                  var result = (target * titles.length).toInt();
+                  var result = (target * model.items.length).toInt();
 
-                  this.result = titles[result];
+                  this.result = model.items[result].name ?? "";
                 });
               });
             });
@@ -92,7 +102,15 @@ class _ChoicePageState extends State<ChoicePage>
               primary: currentColorScheme.secondary,
               onPrimary: Colors.black,
               minimumSize: const Size(150, 40)),
-          onPressed: () => navigatorState.pushNamed("/options"),
+          onPressed: () => navigatorState.pushNamed("/options").then((value) {
+            setState(() {
+              if (value != null) {
+                model = value as OptionsModel;
+                _controller.reset();
+                print("model:${model.name}");
+              }
+            });
+          }),
           child: const Text(
             "切换选项",
             style: TextStyle(fontSize: 20),
