@@ -161,8 +161,8 @@ class _OptionEditPageState extends State<OptionEditPage> {
       title: TextButton(
         child: Text(
           item.name ?? "选项内容",
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+          // maxLines: 1,
+          // overflow: TextOverflow.ellipsis,
           style: TextStyle(
               fontSize: 15,
               color: item.name != null || (item.name?.isEmpty ?? false)

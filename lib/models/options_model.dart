@@ -14,4 +14,16 @@ class OptionsModel extends HiveObject {
 
   @HiveField(2, defaultValue: [])
   List<OptionsModel> items = [];
+
+  OptionsModel();
+
+  OptionsModel.withLocalMap(Map map) {
+    name = map["name"];
+    List childs = map["child"];
+    childs.forEach((element) {
+      OptionsModel model = OptionsModel();
+      model.name = element;
+      items.add(model);
+    });
+  }
 }

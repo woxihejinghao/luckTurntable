@@ -24,7 +24,8 @@ class _OptionsPageState extends State<OptionsPage> {
       ),
       body: SafeArea(child: _buildListView()),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.of(context).pushNamed("/options/edit"),
+        onPressed: () =>
+            Navigator.of(context).pushNamed("/options/selectTemplate"),
         child: const Icon(Icons.add),
       ),
     );

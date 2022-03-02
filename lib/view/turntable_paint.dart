@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:luck_turntable/common/instances.dart';
 
 class TurntablePainter extends CustomPainter {
@@ -39,32 +40,41 @@ class TurntablePainter extends CustomPainter {
       ..style = PaintingStyle.fill; //填充、
 
     int num = titles.length;
+
     Rect rect = Rect.fromCircle(
         center: Offset(size.width / 2, (size.height - 50) / 2),
         radius: size.width / 2);
-
+    if (num == 0) {
+      canvas.drawCircle(Offset(size.width / 2, (size.height - 50) / 2),
+          size.width / 2, paint..color = currentColorScheme.primary);
+      return;
+    }
     for (var i = 0; i < num; i++) {
       //绘制分区
       canvas.drawArc(rect, 2 * pi * i / num, 2 * pi * 1 / num, true,
           paint..color = currentColorScheme.primary);
       //绘制分割线
-      canvas.drawArc(
-          rect,
-          2 * pi * i / num,
-          2 * pi * 1 / num,
-          true,
-          Paint()
-            ..color = Colors.white
-            ..style = PaintingStyle.stroke);
+      if (num > 1) {
+        canvas.drawArc(
+            rect,
+            2 * pi * i / num,
+            2 * pi * 1 / num,
+            true,
+            Paint()
+              ..color = Colors.white
+              ..style = PaintingStyle.stroke);
+      }
       //绘制文字
       TextPainter textPainter = TextPainter(
+          maxLines: 2,
           text: TextSpan(
               text: titles[i],
-              style: const TextStyle(fontSize: 18, color: Colors.white)),
-          textAlign: TextAlign.left,
+              style: TextStyle(
+                  fontSize: ScreenUtil().setSp(12), color: Colors.white)),
+          textAlign: TextAlign.right,
           textDirection: TextDirection.ltr);
 
-      textPainter.layout();
+      textPainter.layout(maxWidth: size.width / 3 - 20);
       Size textSize = textPainter.size;
       canvas.save(); //保存画布副本
       Offset offset = Offset(
@@ -125,7 +135,7 @@ class TurntablePainter extends CustomPainter {
 
     TextPainter textPainter = TextPainter(
         text: const TextSpan(
-            text: "转",
+            text: "吉",
             style: TextStyle(
               fontSize: 20,
               color: Colors.white,

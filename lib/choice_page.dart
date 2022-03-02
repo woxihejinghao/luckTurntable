@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:luck_turntable/common/instances.dart';
 import 'package:luck_turntable/models/options_model.dart';
-import 'package:luck_turntable/turntable_paint.dart';
+import 'package:luck_turntable/view/turntable_paint.dart';
 
 class ChoicePage extends StatefulWidget {
   const ChoicePage({Key? key}) : super(key: key);
@@ -15,50 +17,65 @@ class _ChoicePageState extends State<ChoicePage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _angleAnimation;
-  String result = "";
+  String result = "???";
 
   var model = OptionsModel();
 
   double target = 0;
+  DateTime? lastTime;
   @override
   void initState() {
     super.initState();
     _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2));
+        AnimationController(vsync: this, duration: const Duration(seconds: 3));
     // _controller.fling(
     //     velocity: 10,
     //     springDescription:
     //         const SpringDescription(mass: 1, stiffness: 500, damping: 3));
-    _angleAnimation = CurvedAnimation(parent: _controller, curve: Curves.ease);
+    _angleAnimation =
+        CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine);
+    _controller.addListener(() {
+      if (lastTime == null) {
+        var _type = FeedbackType.light;
+        Vibrate.feedback(_type);
+
+        lastTime = DateTime.now();
+      } else {
+        var now = DateTime.now();
+        if (now.difference(lastTime!).inMilliseconds > 200) {
+          var _type = FeedbackType.light;
+          Vibrate.feedback(_type);
+          lastTime = DateTime.now();
+        }
+      }
+    });
+
+    _controller.addStatusListener((status) {
+      print("状态:$status");
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("幸运转盘"),
+        title: Text(model.name ?? "幸运转盘"),
       ),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildResultContainer(),
-            model.items.isEmpty
-                ? Text(
-                    "请选择模版...",
-                    style: currentTheme.textTheme.subtitle1
-                        ?.copyWith(color: Colors.grey),
-                  )
-                : SizedBox(
-                    height: MediaQuery.of(context).size.width * 0.9 + 50,
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    child: CustomPaint(
-                      painter: TurntablePainter(
-                          model.items.map((e) => e.name ?? "").toList(),
-                          _angleAnimation,
-                          target: target),
-                    ),
-                  ),
+            SizedBox(
+              height: MediaQuery.of(context).size.width * 0.9 + 50,
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: CustomPaint(
+                painter: TurntablePainter(
+                    model.items.map((e) => e.name ?? "").toList(),
+                    _angleAnimation,
+                    target: target),
+              ),
+            ),
             const SizedBox(
               height: 60,
             ),
@@ -79,6 +96,11 @@ class _ChoicePageState extends State<ChoicePage>
               onPrimary: Colors.black,
               minimumSize: const Size(150, 40)),
           onPressed: () {
+            if (model.items.isEmpty) {
+              Fluttertoast.showToast(
+                  msg: "请选择模版", gravity: ToastGravity.CENTER);
+              return;
+            }
             setState(() {
               target = Random().nextDouble();
 
@@ -107,7 +129,6 @@ class _ChoicePageState extends State<ChoicePage>
               if (value != null) {
                 model = value as OptionsModel;
                 _controller.reset();
-                print("model:${model.name}");
               }
             });
           }),
@@ -122,10 +143,12 @@ class _ChoicePageState extends State<ChoicePage>
 
   Widget _buildResultContainer() {
     return Container(
-      padding: const EdgeInsets.only(left: 10, right: 10),
+      padding: const EdgeInsets.all(8),
       alignment: Alignment.center,
-      height: 40,
-      constraints: const BoxConstraints(minWidth: 100, maxWidth: 200),
+      constraints: BoxConstraints(
+          minWidth: 100,
+          maxWidth: MediaQuery.of(context).size.width * 0.8,
+          minHeight: 40),
       child: Text(
         result,
         style: const TextStyle(fontSize: 20),

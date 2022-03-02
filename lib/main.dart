@@ -6,11 +6,13 @@ import 'package:luck_turntable/choice_page.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:luck_turntable/models/options_model.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() async {
   Hive.registerAdapter(OptionsModelAdapter());
   await Hive.initFlutter();
   await Hive.openBox(optionsBox);
+
   runApp(const MyApp());
 }
 
@@ -20,9 +22,25 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    return ScreenUtilInit(
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: () => _buildMaterialApp());
+  }
+
+  MaterialApp _buildMaterialApp() {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
+      builder: (context, widget) {
+        //add this line
+        ScreenUtil.setContext(context);
+        return MediaQuery(
+          //Setting font does not change with system font size
+          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          child: widget!,
+        );
+      },
       navigatorKey: LTInstances.navigatorKey,
       navigatorObservers: [LTInstances.routeObserver],
       initialRoute: "/",
