@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:luck_turntable/common/instances.dart';
@@ -108,7 +109,9 @@ class _ChoicePageState extends State<ChoicePage>
               _controller.forward().then((value) {
                 setState(() {
                   var result = (target * model.items.length).toInt();
+                  // var angle = target * pi * 2;
 
+                  // print("目标值:$angle");
                   this.result = model.items[result].name ?? "";
                 });
               });
@@ -151,7 +154,7 @@ class _ChoicePageState extends State<ChoicePage>
           minHeight: 40),
       child: Text(
         result,
-        style: const TextStyle(fontSize: 20),
+        style: TextStyle(fontSize: ScreenUtil().setSp(15)),
       ),
       decoration: BoxDecoration(
           border: Border.all(color: currentColorScheme.secondary, width: 3),
